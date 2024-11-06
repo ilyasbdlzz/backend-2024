@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Student;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class StudentController extends Controller
 {
@@ -26,23 +27,35 @@ class StudentController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-    {
-    $input = [
-        'name' => $request->name,
-        'nim' => $request->nim,
-        'email' => $request->email,
-        'majority' => $request->majority
-    ];
+{
+    // Validasi input
+    $validator = Validator::make($request->all(), [
+        'name' => 'required',
+        'nim' => 'numeric|required',
+        'email' => 'email|required',
+        'majority' => 'required',
+    ]);
 
-    $students = Student::create($input);
-
-    $response = [
-        'message' => 'Successfully create new student',
-        'data' => $students
-    ];
-    
-    return response()->json($response, 201);
+    // Jika validasi gagal, kembalikan respons error
+    if ($validator->fails()) {
+        return response()->json([
+            'message' => 'Validation errors',
+            'errors' => $validator->errors()
+        ], 422);
     }
+
+    // Simpan data ke database jika validasi berhasil
+    $student = Student::create($request->all());
+
+    // Siapkan respons sukses
+    $data = [
+        'message' => 'Student is created successfully',
+        'data' => $student,
+    ];
+
+    // Kembalikan respons sukses dengan status 201
+    return response()->json($data, 201);
+}
 
     /**
      * Display the specified resource.
