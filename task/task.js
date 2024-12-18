@@ -7,6 +7,7 @@ function showDownload(result) {
   console.log("Hasil Download: " + result);
 }
 
+
 /**
  * Fungsi untuk download file
  * @param {function} callback - Function callback show
